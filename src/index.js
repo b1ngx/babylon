@@ -1,12 +1,12 @@
 import {
-  Engine,
   Scene,
+  Engine,
   Vector3,
-  HemisphericLight,
+  SceneLoader,
   ArcRotateCamera,
-  PointLight,
-  MeshBuilder
+  HemisphericLight
 } from '@babylonjs/core';
+import '@babylonjs/loaders/glTF';
 import 'pepjs';
 
 var canvas = document.querySelector('#glcanvas');
@@ -14,20 +14,22 @@ var engine = new Engine(canvas, true);
 
 var createScene = function() {
   var scene = new Scene(engine);
-  var camera = new ArcRotateCamera(
-    'Camera',
-    Math.PI / 2,
-    Math.PI / 2,
-    2,
-    new Vector3(0, 0, 5),
-    scene
-  );
-  camera.attachControl(canvas, true);
 
-  new HemisphericLight('light1', new Vector3(1, 1, 0), scene);
-  new PointLight('light2', new Vector3(0, 1, -1), scene);
+  //Adding a light
+  var light = new HemisphericLight();
 
-  MeshBuilder.CreateSphere('sphere', { diameter: 2 }, scene);
+  //Adding an Arc Rotate Camera
+  var camera = new ArcRotateCamera('Camera', 0, 0.8, 10, Vector3.Zero(), scene);
+  camera.attachControl(canvas, false);
+
+  // The first parameter can be used to specify which mesh to import. Here we import all meshes
+  SceneLoader.Append('./static/littlest_tokyo/', 'scene.gltf', scene, function(
+    newMeshes
+  ) {
+    scene.activeCamera = null;
+    scene.createDefaultCameraOrLight(true);
+    scene.activeCamera.attachControl(canvas, false);
+  });
 
   return scene;
 };
